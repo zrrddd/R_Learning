@@ -93,6 +93,39 @@ A[-2, ] # '-' means except
 dim(A) # The dimension of A, 就是python里的shape?
 ```
 ## Loading Data
+For most analyses, the first step involves importing a data set into R. 
+```{r}
+# Auto = read.table('Auto.data', header = T, na.strings = '?')
+# dim(Auto) # return the dimension
+# Auto = na.omit(Auto) # remove rows with NA
+# names(Auto) # Check the variable names
+```
+
+Generate some plot
+```{r}
+# plot(Auto$, Auto$)
+# # 或者不使用$
+# attach(Auto)
+# plot(column1, column2) # scatter plot if two numerical
+# hist(column1, col = 2) # histogram
+# pairs(Auto) # scatter plot matrix 
+```
+Quantitative to Categorical with `as.factor()`
+```{r}
+# cylinders = as.factor(cylinders)
+```
+`summary()` function produces a numerical summary of each variable in a particular data set
+```{r}
+summary(Auto)
+```
+
+## Record history
+```{r}
+savehistory() # save a record of all of the commands in the most recent session
+loadhistory() # load the history next time we use R
+```
+
+
 
 
 
