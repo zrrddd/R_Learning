@@ -4,6 +4,7 @@ output: html_notebook
 ---
 Ruidi Zhao's R study note. 
 
+# Lab: Introduction to R
 ```{r}
 x <- c(1,2,3,4)
 y <- c(3,4,5,6)
@@ -116,7 +117,7 @@ Quantitative to Categorical with `as.factor()`
 ```
 `summary()` function produces a numerical summary of each variable in a particular data set
 ```{r}
-summary(Auto)
+# summary(Auto)
 ```
 
 ## Record history
@@ -125,7 +126,86 @@ savehistory() # save a record of all of the commands in the most recent session
 loadhistory() # load the history next time we use R
 ```
 
+# Lab: Linear Regression
+```{r}
+library(MASS)
+library(ISLR)
+names(Boston)
+lm.fit = lm(medv~lstat, data = Boston) # lm: least square linear regression model
+                        # lm(y~x, data)
+```
+Get information about our linear regression model
+```{r}
+lm.fit
+summary(lm.fit)
+names(lm.fit) # what kind of info are stored?
+coef(lm.fit) # get the coefficient; or lm.fit$coefficients
+```
+Next, we examine some diagnostic plots
+```{r}
+par(mfrow = c(2, 2)) # split the screen into 4 parts
+plot(lm.fit)
+```
+```{r}
+plot(predict(lm.fit), residuals(lm.fit))
+plot(predict(lm.fit), rstudent(lm.fit))
+```
 
+Compute the leverage statistics
+```{r}
+plot(hatvalues(lm.fit))
+which.max(hatvalues(lm.fit)) # == python idxmax()
+```
+## Multiple Linear Regression
+```{r}
+lm.fit = lm(medv~lstat + age, data = Boston) # 如果是multiple的话格式是lm(y~x1+x2+x3)
+summary(lm.fit)
+```
+If we want to use all variables as the X variables
+```{r}
+lm.fit = lm(medv~., data = Boston) # use this short-hand!
+summary(lm.fit)
+```
+What if we would like to perform a regression using all of the variables but one?
+```{r}
+lm.fit1 = lm(medv~.-age, data = Boston) # 懂了！就是.-age就好了
+summary(lm.fit1)
+```
+Alternatively, the `update()` function can be used
+```{r}
+lm.fit1 = update(lm.fit, ~.-age) #！！
+```
 
+## Interaction Terms
+```{r}
+summary(lm(medv~lstat*age, data = Boston))
+# lstat*age is the short-hand for: lstat + age + lstat: age
+```
+## Non-linear Transformations of the Predictors
+```{r}
+lm.fit2 = lm(medv~lstat + I(lstat^2), data = Boston)
+summary(lm.fit2)
+```
+The near-zero p-value associated with the quadratic term suggests that it leads to an improved model. We use `anova()` function to further quantify the extent to which the quadratic fit is superior to the linear fit. 
+```{r}
+lm.fit = lm(medv~lstat, data = Boston)
+anova(lm.fit, lm.fit2)
+```
+The `anova()` function performs a hypothesis test comparing the two models. The null hypothesis is that the two models fir the data equally well, and the alternative hypothesis is that the full model is superior. Here, the p-value is near zero, so we favor the alternative hypothesis. 
+```{r}
+par(mfrow = c(2, 2))
+plot(lm.fit2)
+# There is little discernible pattern in the residuals
+```
+We can also do a fifth-order polynomial fit:
+```{r}
+lm.fit5 = lm(medv~poly(lstat, 5), data = Boston)
+summary(lm.fit5)
+```
+Or a log transformation
+```{r}
+summary(lm(medv~log(rm), data = Boston))
+```
+## Qualitative Predictors
 
 
