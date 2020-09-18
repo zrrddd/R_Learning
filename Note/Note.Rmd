@@ -5,6 +5,19 @@ output: html_notebook
 Ruidi Zhao's R study note. 
 
 # Lab: Introduction to R
+
+## Useful commands
+```{r}
+getwd()
+
+```
+## Basic Calculation
+```{r}
+5%%2 # Python: %
+2^3 # Python: **
+```
+
+## Vector
 ```{r}
 x <- c(1,2,3,4)
 y <- c(3,4,5,6)
@@ -21,6 +34,11 @@ ls()
 rm(list=ls()) # remove everything at once
 ```
 
+## List
+```{r}
+x <- list(1:3, TRUE, 'Hello', list(1:2, 5))
+```
+
 ## Matrix
 ```{r}
 x = matrix(data = c(1,2,3,4), nrow = 2, ncol = 2)
@@ -30,6 +48,98 @@ x
 `byrow`的话就是按照row的方向排element
 ```{r}
 matrix(c(1,2,3,4), 2, 2, byrow = TRUE)
+```
+
+## DataFrame
+```{r}
+books <- data.frame(author = c("Ripley", 'Cox', 'Snijders', 'Cox'),
+                    year = c(1980, 1979, 1999, 2006),
+                    publihser = c('Wiley', "Chapman", "Sage", "CUP"))
+books
+```
+## Function
+```{r}
+setdiff
+```
+
+```{r}
+args(setdiff) # Get the arguments for function
+```
+### Writing Functions
+```{r}
+square = function(x) {
+  x^2
+}
+square(4)
+```
+
+```{r}
+mean2 <- function(x) {
+  n <- length(x)
+  sum(x)/n
+}
+mean2(1:10)
+```
+### `for()` Loops
+```{r}
+factorial2 = function(n) {
+  out = 1
+  
+  for (i in 1:n) {
+    out = out * i
+  }
+  
+  out
+}
+factorial2(10)
+```
+也可以不用在function外面
+```{r}
+for (name in 1:4) 
+  print(name)
+```
+
+### Conditional Code
+`for()` loop
+```{r}
+abs2 = function(x) {
+  if (x < 0) out = -x
+  else out = x
+  out
+}
+abs2(-4)
+```
+Or you can use `ifelse()`
+```{r}
+abs3 = function(x) {
+  ifelse(x < 0, -x, x)
+}
+abs3(2)
+abs3(-3)
+```
+
+`while()` loops
+```{r}
+isPrime = function(n){
+  i = 2
+  if (n < 2) return(FALSE)
+  
+  while (i < sqrt(n)) {
+    if (n%%i == 0) return(FALSE)
+    i = i + 1
+  }
+  return(TRUE) # 注意return后面一定要加上括号
+}
+isPrime(10)
+isPrime(37)
+```
+### Recursion
+```{r}
+fib = function(n) {
+  if (n<2) return(1)
+  else return(fib(n-1) + fib(n-2))
+}
+fib(10) # 斐波那契数列
 ```
 
 ## Random Variables
@@ -207,5 +317,29 @@ Or a log transformation
 summary(lm(medv~log(rm), data = Boston))
 ```
 ## Qualitative Predictors
+```{r}
+names(Carseats) # examine the Carseats data
+# Try to predict Sales
+```
+
+```{r}
+lm.fit = lm(Sales~.+Income:Advertising+Price:Age, data = Carseats)
+# 如果有Categorical data, R 自动 dummy variable
+summary(lm.fit)
+```
+The `contrasts()` function returns the coding that R uses for the dummy variables
+```{r}
+contrasts(Carseats$ShelveLoc)
+# ShelveLocGood & ShelveLocMeidum
+# 注意，自动drop_first = True
+```
+
+```{r}
+LoadLibraries = funcion() {
+  library(ISIR)
+  library(MASS)
+  print("The libraries have been loaded.")
+}
+```
 
 
