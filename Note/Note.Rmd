@@ -141,6 +141,18 @@ fib = function(n) {
 }
 fib(10) # 斐波那契数列
 ```
+### `apply()`
+If we want to perform a function on every row or column in a matrix (or array), we can use the `apply()` function. The syntax is apply(x, d, f), which will apply the function f to each of the dth dimension of x.If d = 1 this corresponds to rows, and d = 2 to the columns of a matrix. 这个d不就跟python的axis差不多？
+```{r}
+A = cbind(1:10, (1:10)^2, (1:10)^3)
+apply(A, 2, sums) # calculate the sum of all columns
+```
+It will also work for the matrix-like objects, such as data frames.
+```{r}
+library(MASS)
+apply(hills, 2, mean)
+apply(hills, 2, sd)
+```
 
 ## Random Variables
 ```{r}
@@ -152,6 +164,110 @@ y = x + rnorm(50, mean = 50, sd = 0.1)
 cor(x, y) # Get the correlation between x and y 
 var(x)
 sd(x)
+```
+For the particular task of sums or means of rows or columns in a matrix, R contains special functions `rowSums()`, `colSums()`, `rowMeans()`, `colMeans()`. These are all much faster than the equivalent `apply()` commands. 
+### `sapply()` and `lapply()`
+`lapply()`: use if we want to apply a function to every entry in a list of vector, the syntax is `lapply(vector/list, function)`.
+```{r}
+mu = c(-2, -1, 0, 1, 2)
+out = lapply(mu, function(x) rnorm(100, mean = x))
+lapply(out, mean)
+```
+If we want the result to be a vector
+```{r}
+sapply(out, mean) #除了这个sapply和lapply都是一样的
+```
+
+### `replicate()`
+Sometimes we wish to repeat exactly the same operation multiple times, without having a different input (this is typically used in conjunction with the generation of random numbers)
+```{r}
+out = replicate(20, rnorm(100), simplify = FALSE)
+# out is a list of 20 independent data sets, each consisting of 100 standard normal random variables
+```
+### `tapply()`
+Evaluate a function on data in a vector of list which are *grouped* according to the levels of some other factor. For example, 
+```{r}
+library(MASS)
+head(genotype)
+```
+```{r}
+with(genotype, tapply(Wt, Mother, mean))
+# group according to the value of Mother
+# with(genotype, tapply(Wt, Mother, summary))
+```
+It is also possible to provide more than one grouping in the form of a list of data frame, in which case the data are broken down by both:
+```{r}
+tapply(genotype$Wt, genotype[,1:2], mean)
+```
+### `mapply()`
+Sometimes it may be useful to apply a function of several arguments repeatedly, where more than one argument can change. 
+```{r}
+mapply(seq, from = c(1,4,-3), to = c(2,9,0), by = 0.5)
+# 1, 2
+# 4, 9
+# -3, 0
+```
+## Arrays and Tables
+```{r}
+occupationalStatus
+# 如果用dataframe表示的话就是3498行，所以可以用这种 "contingency table"（难道不是pivot table吗？）
+```
+### Higher Dimensions
+Arrays are defined much like matrices, with a call to the `array()` command. 
+```{r}
+arr = array(1:24, dim = c(2,3,4))
+# di就是dimension，所以这边是define了一个2*3*4的array
+# 所以就是2行3列，然后有4个这样的东西？
+arr
+```
+```{r}
+dim(arr)
+```
+Note that a 2-dimensional array is identical to a matrix. Arrays can be subsetted and modified in exactly the same way as a matrix, only using the appropriate number of co-ordinates:
+```{r}
+arr[1,2,3]
+# 1 行 2 列 第三个东西
+```
+```{r}
+arr[,2,]
+```
+### Tables
+```{r}
+library(MASS)
+head(cabbages)
+```
+```{r}
+table(cabbages$Date)
+# 懂了就是table相当于value_counts() in Python
+```
+```{r}
+table(cabbages[,1:2])
+```
+### Binning the Data
+Discretization
+```{r}
+# Discretization: group data together into intervals
+head(Nile)
+bins = c(0, seq(from = 700, to=1300, by=100), Inf) # Inf 就是infinite
+bins
+```
+```{r}
+disNile = cut(Nile, bins)
+head(disNile)
+```
+```{r}
+table(disNile)
+```
+```{r}
+# you can adjust the lable
+disNile = cut(Nile, bins, labels = bins[-9])
+table(disNile)
+```
+## Strings
+You can send a string to the screen using the `cat()` function.
+```{r}
+cat("hello")
+"hello" # 如果直接写的话就会有双引号
 ```
 
 ## Graphics
