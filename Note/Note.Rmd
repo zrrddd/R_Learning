@@ -145,7 +145,7 @@ fib(10) # 斐波那契数列
 If we want to perform a function on every row or column in a matrix (or array), we can use the `apply()` function. The syntax is apply(x, d, f), which will apply the function f to each of the dth dimension of x.If d = 1 this corresponds to rows, and d = 2 to the columns of a matrix. 这个d不就跟python的axis差不多？
 ```{r}
 A = cbind(1:10, (1:10)^2, (1:10)^3)
-apply(A, 2, sums) # calculate the sum of all columns
+apply(A, 2, sum) # calculate the sum of all columns
 ```
 It will also work for the matrix-like objects, such as data frames.
 ```{r}
@@ -538,3 +538,63 @@ predict(glm.fit2, newdata = data.frame(Lag1 = c(1.2, 1.5), Lag2 = c(1.1, -0.8)),
 ```
 
 ## Linear Discriminant Analysis
+In R, we fit an LDA model using the `lda()` function, which is part of the MASS library.
+```{r}
+library(MASS)
+lda.fit = lda(Direction~Lag1 + Lag2, data = Smarket, subset = train)
+lda.fit
+```
+```{r}
+lda.pred = predict(lda.fit, Smarket.2005)
+names(lda.pred)
+# class: 就是predict的class
+# posterior: posterior probability
+# x: linear discriminants, obtained by computing -0.642 * Lag1 - 0.514 * Lag2
+```
+```{r}
+lda.class = lda.pred$class
+table(lda.class, Direction.2005)
+mean(lda.class == Direction.2005)
+```
+## Quadratic Discriminant Analysis
+```{r}
+qda.fit = qda(Direction~Lag1+Lag2, data = Smarket, subset = train)
+qda.fit
+```
+The output contains the group means. But it does not contain the coefficients of the linear discriminants, because the QDA classifier involves a quadratic, rather than a linear function. 
+```{r}
+qda.class = predict(qda.fit, Smarket.2005)$class
+table(qda.class, Direction.2005)
+mean(qda.class == Direction.2005)
+```
+
+## K-Nearest Neighbors
+We will now perform KNN using the `knn()` function, which is part of the `class` library.
+<br>
+It requires 4 inputs:<br>
+  1. train.X <br>
+  2. test.X <br>
+  3. train.Direction <br>
+  4. K <br>
+```{r}
+library(class)
+train.X = cbind(Lag1, Lag2)[train,]
+test.X = cbind(Lag1, Lag2)[!train,]
+train.Direction = Direction[train]
+```
+
+We use a random seed before we apply `knn()` because if several observations are tied as nearest neighbors, then R will randomly break the tie.
+```{r}
+set.seed(42)
+knn.pred = knn(train.X, test.X, train.Direction, k = 1) # 不用fit了直接出结果？
+table(knn.pred, Direction.2005)
+mean(knn.pred == Direction.2005)
+```
+Use K = 3
+```{r}
+set.seed(42)
+knn.pred = knn(train.X, test.X, train.Direction, k = 3) # 不用fit了直接出结果？
+table(knn.pred, Direction.2005)
+mean(knn.pred == Direction.2005)
+```
+It appears that for this data, QDA procides the best results of the models that we have examined so far. 
